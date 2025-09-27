@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aura Weather - Immersive Weather Experience</title>
-  <meta name="description" content="Experience weather like never before with stunning 3D visuals and real-time forecasts"/>
+  <meta name="description" content="Experience weather like never before with stunning 3D visuals, parallax, and real-time forecasts"/>
 
-  <link rel="stylesheet" href="style.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 
@@ -16,15 +15,16 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-  <style>
-
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="overflow-x-hidden">
   <!-- Background media -->
   <video id="bgVideo" class="bg-media" autoplay muted loop playsinline></video>
   <img id="bgImage" class="bg-media" alt="City background"/>
-  <div class="bg-overlay"></div>
+  <div class="bg-overlay" id="bgOverlay"></div>
+
+  <!-- Floating particles (parallax depth) -->
+  <div class="parallax-particles" id="particles"></div>
 
   <!-- Header -->
   <header class="relative z-10 px-6 md:px-8 py-6">
@@ -39,15 +39,22 @@
         </div>
       </div>
       <div class="flex items-center gap-3 w-full sm:w-auto">
-        <div class="relative flex-1 sm:w-96">
-          <input id="searchInput" type="text" placeholder="Search city... (e.g., Mumbai, Paris, Tokyo)"
-                 class="input-glass w-full h-12 pr-16"/>
-          <button id="searchBtn" class="btn btn-primary absolute right-1 top-1 bottom-1 px-4 flex items-center gap-2">
-            <i data-lucide="search" class="w-4 h-4"></i><span>Go</span>
-          </button>
+        <div class="relative flex-1 sm:w-[28rem]">
+          <input id="searchInput" type="text" placeholder="Search city... (e.g., Mumbai, Paris, Tokyo)" class="input-glass w-full h-12 pr-28"/>
+          <div class="absolute right-1 top-1 bottom-1 flex gap-1">
+            <button id="clockBtn" class="glass-card px-3 py-2 text-white text-xs hover:bg-white/20 btn">24h</button>
+            <button id="searchBtn" class="btn btn-primary h-full px-4 flex items-center gap-2">
+              <i data-lucide="search" class="w-4 h-4"></i><span>Go</span>
+            </button>
+          </div>
         </div>
         <button id="unitBtn" class="glass-card px-4 py-3 text-white hover:bg-white/20 btn">°C</button>
       </div>
+    </div>
+
+    <!-- Recent searches -->
+    <div class="max-w-7xl mx-auto mt-4 px-1" id="recentWrap" style="display:none">
+      <div class="flex flex-wrap gap-2" id="recentChips"></div>
     </div>
   </header>
 
@@ -55,10 +62,10 @@
   <div id="fx" class="effect"></div>
 
   <!-- Main -->
-  <main class="relative z-10 px-6 md:px-8 pb-20">
+  <main class="relative z-10 px-6 md:px-8 pb-24">
     <div class="max-w-7xl mx-auto space-y-8">
-      <!-- Main card (TILT) -->
-      <section id="mainCard" class="glass-strong p-8 md:p-10 rounded-2xl tilt">
+      <!-- Main card (TILT + ultra transparent + parallax) -->
+      <section id="mainCard" class="glass-strong glass-ultra p-8 md:p-10 rounded-2xl tilt" data-depth="0.12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div class="space-y-6">
             <div class="flex items-center gap-3 text-white/85 tilt-pop-xs">
@@ -73,23 +80,27 @@
               <p id="condition" class="text-xl text-white/85 tilt-pop-sm">Loading...</p>
               <p id="description" class="text-white/60 tilt-pop-sm">Fetching weather data...</p>
               <p id="feelsLike" class="text-white/70 tilt-pop-sm">Feels like --°</p>
+              <div class="flex items-center gap-3 tilt-pop-sm">
+                <span id="aqiPill" class="aq-pill text-sm hidden">AQI —</span>
+                <span id="uvIndex" class="aq-pill text-sm hidden">UV —</span>
+              </div>
             </div>
           </div>
 
           <div id="weatherStats" class="grid grid-cols-2 gap-4 tilt-pop-xs">
-            <div class="glass-card p-4 rounded-xl">
+            <div class="glass-card p-4 rounded-xl" data-depth="0.18">
               <div class="flex items-center gap-3 mb-2"><i data-lucide="wind" class="w-5 h-5 text-blue-300"></i><span class="text-white/70 text-sm">Wind</span></div>
               <p id="windSpeed" class="text-2xl font-semibold">--</p>
             </div>
-            <div class="glass-card p-4 rounded-xl">
+            <div class="glass-card p-4 rounded-xl" data-depth="0.18">
               <div class="flex items-center gap-3 mb-2"><i data-lucide="droplets" class="w-5 h-5 text-blue-300"></i><span class="text-white/70 text-sm">Humidity</span></div>
               <p id="humidity" class="text-2xl font-semibold">--%</p>
             </div>
-            <div class="glass-card p-4 rounded-xl">
+            <div class="glass-card p-4 rounded-xl" data-depth="0.18">
               <div class="flex items-center gap-3 mb-2"><i data-lucide="eye" class="w-5 h-5 text-purple-300"></i><span class="text-white/70 text-sm">Visibility</span></div>
               <p id="visibility" class="text-2xl font-semibold">-- km</p>
             </div>
-            <div class="glass-card p-4 rounded-xl">
+            <div class="glass-card p-4 rounded-xl" data-depth="0.18">
               <div class="flex items-center gap-3 mb-2"><i data-lucide="gauge" class="w-5 h-5 text-red-300"></i><span class="text-white/70 text-sm">Pressure</span></div>
               <p id="pressure" class="text-2xl font-semibold">-- hPa</p>
             </div>
@@ -103,7 +114,7 @@
       </section>
 
       <!-- Hourly -->
-      <section class="glass-strong p-6 rounded-2xl">
+      <section class="glass-strong p-6 rounded-2xl" data-depth="0.08">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-2xl font-bold text-gradient">Next 12 Hours</h2>
           <div class="text-xs text-white/60">Scroll →</div>
@@ -112,9 +123,15 @@
       </section>
 
       <!-- Daily -->
-      <section class="glass-strong p-6 rounded-2xl">
+      <section class="glass-strong p-6 rounded-2xl" data-depth="0.05">
         <h2 class="text-2xl font-bold text-gradient mb-4">7-Day Forecast</h2>
         <div id="dailyForecast" class="grid md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </section>
+
+      <!-- Air quality breakdown -->
+      <section id="aqDetails" class="glass-card p-5 rounded-2xl hidden" data-depth="0.05">
+        <h3 class="font-semibold mb-3">Air Quality Components</h3>
+        <div id="aqList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-sm"></div>
       </section>
 
       <!-- Attribution -->
@@ -135,5 +152,5 @@
   <script src="jaa.js">
 
   </script>
-</body>
+</body> 
 </html>
