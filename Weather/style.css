@@ -1,4 +1,4 @@
-    :root{
+:root{
       --background: 222 84% 4%;
       --foreground: 210 100% 98%;
       --primary: 214 100% 60%;
@@ -6,8 +6,8 @@
       --primary-deep: 214 100% 40%;
       --secondary: 266 83% 58%;
       --accent: 166 76% 46%;
-      --shadow-deep: 0 20px 40px rgba(0,0,0,0.4);
-      --shadow-aurora: 0 0 60px hsl(var(--primary) / 0.2), 0 0 100px hsl(var(--secondary) / 0.1);
+      --shadow-deep: 0 20px 40px rgba(0,0,0,0.35);
+      --shadow-aurora: 0 0 60px hsl(var(--primary) / 0.18), 0 0 100px hsl(var(--secondary) / 0.08);
       --t-smooth: all .4s cubic-bezier(.4,0,.2,1);
     }
     *{box-sizing:border-box}
@@ -16,26 +16,35 @@
       font-family:'Inter',system-ui,-apple-system,sans-serif;
       background:hsl(var(--background));
       color:hsl(var(--foreground));
-      overflow-x:hidden; /* allow vertical scroll, hide horizontal */
+      overflow-x:hidden;
     }
 
-    /* Glass */
+    /* Glass – more TRANSPARENT now */
     .glass-card{
-      background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));
-      backdrop-filter:blur(20px);
-      border:1px solid rgba(255,255,255,.1);
+      background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      -webkit-backdrop-filter:blur(14px);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.08);
       box-shadow:var(--shadow-deep);
       border-radius:1rem;
     }
     .glass-strong{
-      background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.08));
-      backdrop-filter:blur(25px);
-      border:1px solid rgba(255,255,255,.2);
+      background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.05));
+      -webkit-backdrop-filter:blur(12px);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.12);
       box-shadow:var(--shadow-aurora);
       border-radius:1.25rem;
     }
+    /* Ultra transparent big box (applied to main card) */
+    .glass-ultra{
+      background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.03)) !important;
+      -webkit-backdrop-filter:blur(10px) saturate(120%);
+      backdrop-filter:blur(10px) saturate(120%);
+      border-color:rgba(255,255,255,.10);
+    }
 
-    /* Aurora badge anim */
+    /* Aurora & gradient text */
     .aurora-bg{
       background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary)),hsl(var(--accent)));
       background-size:400% 400%;
@@ -54,13 +63,34 @@
     }
     @keyframes gradient-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-    /* Background media */
+    /* Background media (parallax-enabled) */
     .bg-media{
-      position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:0;
-      transition:opacity 800ms ease;
+      position:fixed;inset:0;width:105%;height:105%;object-fit:cover;z-index:-3;opacity:0;
+      transition:opacity 800ms ease, transform 0.3s ease-out;
+      will-change:transform, opacity;
     }
     .bg-media.active{opacity:1}
-    .bg-overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.3),rgba(0,0,0,.65));z-index:-1}
+    .bg-overlay{
+      position:fixed;inset:0;
+      background:linear-gradient(135deg,rgba(0,0,0,.22),rgba(0,0,0,.55));
+      z-index:-2;
+      will-change:transform;
+    }
+
+    /* Subtle floating particles layer for depth */
+    .parallax-particles{
+      position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;
+    }
+    .particle{
+      position:absolute;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.18), rgba(255,255,255,0));
+      width:12px;height:12px;filter:blur(1px);
+      animation:float 12s ease-in-out infinite;
+    }
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-18px)}
+    }
 
     /* Weather effects */
     .effect{pointer-events:none;position:fixed;inset:0;z-index:0}
@@ -84,8 +114,8 @@
     }
     .btn-primary:hover{background:hsl(var(--primary-deep));transform:scale(1.05)}
     .input-glass{
-      background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
-      border:1px solid rgba(255,255,255,.2);border-radius:.75rem;padding:.75rem 1rem;color:#fff;outline:none;
+      background:rgba(255,255,255,.10);backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.20);border-radius:.75rem;padding:.75rem 1rem;color:#fff;outline:none;
       transition:var(--t-smooth)
     }
     .input-glass::placeholder{color:rgba(255,255,255,.6)}
@@ -93,7 +123,7 @@
 
     /* Loading */
     .pulse{animation:pulse 1.8s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6)}
 
     /* Forecast scrollers */
     .scroll-smooth{scroll-behavior:smooth}
@@ -113,4 +143,21 @@
 
     @media (prefers-reduced-motion:reduce){
       .tilt, .tilt:hover { transform:none !important; transition:none !important; }
+      .bg-media, .bg-overlay { transform:none !important; }
+    }
+
+    /* Chips */
+    .chip{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:.35rem .7rem;
+      font-size:.85rem;
+      cursor:pointer;
+      transition:var(--t-smooth);
+    }
+    .chip:hover{background:rgba(255,255,255,.15)}
+    .aq-pill{
+      border-radius:999px;padding:.25rem .6rem;font-weight:600;
+      background:rgba(255,255,255,.12);
     }
