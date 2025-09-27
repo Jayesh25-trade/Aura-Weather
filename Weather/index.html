@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aura Weather - Immersive Weather Experience</title>
+  <meta name="description" content="Experience weather like never before with stunning 3D visuals and real-time forecasts"/>
+
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+
+  </style>
+</head>
+<body class="overflow-x-hidden">
+  <!-- Background media -->
+  <video id="bgVideo" class="bg-media" autoplay muted loop playsinline></video>
+  <img id="bgImage" class="bg-media" alt="City background"/>
+  <div class="bg-overlay"></div>
+
+  <!-- Header -->
+  <header class="relative z-10 px-6 md:px-8 py-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl aurora-bg flex items-center justify-center shadow-lg">
+          <span class="text-2xl font-extrabold text-white">A</span>
+        </div>
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold text-gradient">Aura Weather</h1>
+          <p class="text-white/70 text-sm">Immersive weather experience</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-96">
+          <input id="searchInput" type="text" placeholder="Search city... (e.g., Mumbai, Paris, Tokyo)"
+                 class="input-glass w-full h-12 pr-16"/>
+          <button id="searchBtn" class="btn btn-primary absolute right-1 top-1 bottom-1 px-4 flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4"></i><span>Go</span>
+          </button>
+        </div>
+        <button id="unitBtn" class="glass-card px-4 py-3 text-white hover:bg-white/20 btn">°C</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Effects layer -->
+  <div id="fx" class="effect"></div>
+
+  <!-- Main -->
+  <main class="relative z-10 px-6 md:px-8 pb-20">
+    <div class="max-w-7xl mx-auto space-y-8">
+      <!-- Main card (TILT) -->
+      <section id="mainCard" class="glass-strong p-8 md:p-10 rounded-2xl tilt">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 text-white/85 tilt-pop-xs">
+              <i data-lucide="map-pin" class="w-5 h-5 text-blue-400"></i>
+              <span id="locationText" class="text-lg">Searching...</span>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-5 tilt-pop">
+                <span id="temperature" class="text-7xl md:text-8xl font-light text-gradient">--°</span>
+                <div id="weatherIcon" class="text-6xl"><i data-lucide="sun" class="w-16 h-16 text-yellow-400"></i></div>
+              </div>
+              <p id="condition" class="text-xl text-white/85 tilt-pop-sm">Loading...</p>
+              <p id="description" class="text-white/60 tilt-pop-sm">Fetching weather data...</p>
+              <p id="feelsLike" class="text-white/70 tilt-pop-sm">Feels like --°</p>
+            </div>
+          </div>
+
+          <div id="weatherStats" class="grid grid-cols-2 gap-4 tilt-pop-xs">
+            <div class="glass-card p-4 rounded-xl">
+              <div class="flex items-center gap-3 mb-2"><i data-lucide="wind" class="w-5 h-5 text-blue-300"></i><span class="text-white/70 text-sm">Wind</span></div>
+              <p id="windSpeed" class="text-2xl font-semibold">--</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <div class="flex items-center gap-3 mb-2"><i data-lucide="droplets" class="w-5 h-5 text-blue-300"></i><span class="text-white/70 text-sm">Humidity</span></div>
+              <p id="humidity" class="text-2xl font-semibold">--%</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <div class="flex items-center gap-3 mb-2"><i data-lucide="eye" class="w-5 h-5 text-purple-300"></i><span class="text-white/70 text-sm">Visibility</span></div>
+              <p id="visibility" class="text-2xl font-semibold">-- km</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <div class="flex items-center gap-3 mb-2"><i data-lucide="gauge" class="w-5 h-5 text-red-300"></i><span class="text-white/70 text-sm">Pressure</span></div>
+              <p id="pressure" class="text-2xl font-semibold">-- hPa</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-8 mt-8 pt-8 border-t border-white/10 tilt-pop-xs">
+          <div class="flex items-center gap-2"><i data-lucide="sunrise" class="w-5 h-5 text-yellow-400"></i><span id="sunrise">--:--</span></div>
+          <div class="flex items-center gap-2"><i data-lucide="sunset" class="w-5 h-5 text-orange-400"></i><span id="sunset">--:--</span></div>
+        </div>
+      </section>
+
+      <!-- Hourly -->
+      <section class="glass-strong p-6 rounded-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold text-gradient">Next 12 Hours</h2>
+          <div class="text-xs text-white/60">Scroll →</div>
+        </div>
+        <div id="hourlyForecast" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2"></div>
+      </section>
+
+      <!-- Daily -->
+      <section class="glass-strong p-6 rounded-2xl">
+        <h2 class="text-2xl font-bold text-gradient mb-4">7-Day Forecast</h2>
+        <div id="dailyForecast" class="grid md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </section>
+
+      <!-- Attribution -->
+      <p id="attribution" class="text-center text-white/55 text-xs"></p>
+    </div>
+  </main>
+
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 hidden">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="glass-strong p-8 rounded-2xl text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full aurora-bg pulse"></div>
+        <p id="loadingText" class="text-white">Loading…</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="jaa.js">
+
+  </script>
+</body>
+</html>

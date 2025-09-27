@@ -1,0 +1,116 @@
+    :root{
+      --background: 222 84% 4%;
+      --foreground: 210 100% 98%;
+      --primary: 214 100% 60%;
+      --primary-foreground: 222 84% 4%;
+      --primary-deep: 214 100% 40%;
+      --secondary: 266 83% 58%;
+      --accent: 166 76% 46%;
+      --shadow-deep: 0 20px 40px rgba(0,0,0,0.4);
+      --shadow-aurora: 0 0 60px hsl(var(--primary) / 0.2), 0 0 100px hsl(var(--secondary) / 0.1);
+      --t-smooth: all .4s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      background:hsl(var(--background));
+      color:hsl(var(--foreground));
+      overflow-x:hidden; /* allow vertical scroll, hide horizontal */
+    }
+
+    /* Glass */
+    .glass-card{
+      background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:var(--shadow-deep);
+      border-radius:1rem;
+    }
+    .glass-strong{
+      background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.08));
+      backdrop-filter:blur(25px);
+      border:1px solid rgba(255,255,255,.2);
+      box-shadow:var(--shadow-aurora);
+      border-radius:1.25rem;
+    }
+
+    /* Aurora badge anim */
+    .aurora-bg{
+      background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary)),hsl(var(--accent)));
+      background-size:400% 400%;
+      animation:aurora 8s ease-in-out infinite;
+    }
+    @keyframes aurora{
+      0%,100%{background-position:0% 50%}
+      25%{background-position:100% 50%}
+      50%{background-position:100% 100%}
+      75%{background-position:0% 100%}
+    }
+    .text-gradient{
+      background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--secondary)),hsl(var(--accent)));
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      background-size:200% 200%;animation:gradient-shift 3s ease-in-out infinite;
+    }
+    @keyframes gradient-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+    /* Background media */
+    .bg-media{
+      position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:0;
+      transition:opacity 800ms ease;
+    }
+    .bg-media.active{opacity:1}
+    .bg-overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.3),rgba(0,0,0,.65));z-index:-1}
+
+    /* Weather effects */
+    .effect{pointer-events:none;position:fixed;inset:0;z-index:0}
+    .effect.rain::before{
+      content:"";position:absolute;inset:0;
+      background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.12) 0 2px,transparent 2px 6px);
+      animation:rainMove 1.6s linear infinite;filter:blur(.3px)
+    }
+    @keyframes rainMove{from{background-position:0 0}to{background-position:200px 600px}}
+    .effect.snow::before{
+      content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.85) 1px,transparent 2px);
+      background-size:4px 4px;animation:snow 10s linear infinite
+    }
+    @keyframes snow{from{background-position:0 0}to{background-position:0 600px}}
+
+    /* Buttons/inputs */
+    .btn{transition:var(--t-smooth);border-radius:.75rem}
+    .btn-primary{
+      background:hsl(var(--primary));color:hsl(var(--primary-foreground));
+      padding:.7rem 1.1rem;border:none
+    }
+    .btn-primary:hover{background:hsl(var(--primary-deep));transform:scale(1.05)}
+    .input-glass{
+      background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.2);border-radius:.75rem;padding:.75rem 1rem;color:#fff;outline:none;
+      transition:var(--t-smooth)
+    }
+    .input-glass::placeholder{color:rgba(255,255,255,.6)}
+    .input-glass:focus{border-color:hsl(var(--primary));box-shadow:0 0 18px hsl(var(--primary)/.35)}
+
+    /* Loading */
+    .pulse{animation:pulse 1.8s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+    /* Forecast scrollers */
+    .scroll-smooth{scroll-behavior:smooth}
+    .no-scrollbar::-webkit-scrollbar{height:0;width:0}
+
+    /* 3D TILT EFFECT */
+    .tilt{
+      transform-style:preserve-3d;
+      transform:perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1);
+      transition:transform 250ms ease, box-shadow 250ms ease;
+      will-change:transform;
+    }
+    .tilt:hover{box-shadow:0 25px 60px rgba(0,0,0,.45)}
+    .tilt-pop{transform:translateZ(35px)}
+    .tilt-pop-sm{transform:translateZ(18px)}
+    .tilt-pop-xs{transform:translateZ(10px)}
+
+    @media (prefers-reduced-motion:reduce){
+      .tilt, .tilt:hover { transform:none !important; transition:none !important; }
+    }
